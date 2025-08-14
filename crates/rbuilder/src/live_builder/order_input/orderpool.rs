@@ -11,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio::sync::mpsc::{self};
-use tracing::{error, trace};
+use tracing::{error, info, trace};
 
 use super::{
     order_sink::{OrderPoolCommand, OrderSender2OrderSink},
@@ -120,6 +120,7 @@ impl OrderPool {
                 (order, None)
             }
             Order::Bundle(bundle) => {
+                info!("[lore]: proccessing bundle order: {:?}", bundle.uuid);
                 let target_block = bundle.block;
                 match target_block {
                     Some(target_block) => {

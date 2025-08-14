@@ -159,6 +159,8 @@ async fn handle_eth_send_bundle(
     timeout: Duration,
     params: jsonrpsee::types::Params<'static>,
 ) {
+    info!("[lore]: Handling eth_sendBundle request");
+
     let received_at = OffsetDateTime::now_utc();
     let start = Instant::now();
     let raw_bundle: RawBundle = match params.one() {
@@ -174,6 +176,9 @@ async fn handle_eth_send_bundle(
         let ts_nanos = (ts * 1_000_000_000.0) as i128;
         OffsetDateTime::from_unix_timestamp_nanos(ts_nanos).ok()
     });
+
+    let uuid = raw_bundle.uuid;
+
     let bundle_res = match raw_bundle.decode(TxEncoding::WithBlobData) {
         Ok(bundle_res) => bundle_res,
         Err(err) => {
@@ -182,6 +187,11 @@ async fn handle_eth_send_bundle(
             return;
         }
     };
+
+    info!(
+        "[lore] successfully decoded raw bundle with uuid: {:?}",
+        uuid
+    );
 
     match bundle_res {
         RawBundleDecodeResult::NewBundle(bundle) => {
